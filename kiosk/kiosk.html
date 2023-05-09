@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Hamburger Order Kiosk</title>
+	<style>
+		body {
+			font-family: Arial, sans-serif;
+			margin: 0;
+			padding: 0;
+			background-color: #f2f2f2;
+			
+		}
+		
+		h1 {
+			text-align: center;
+			margin-top: 50px;
+		}
+		
+		h2 {
+			text-align: center;
+			margin-bottom: 10px;
+		}
+		#choo1 {
+			text-align: center;
+			margin-top : 50px;
+		}
+		#choo2 {
+			text-align: center;
+			margin-top : 50px;
+		}
+		#choo3 {
+			text-align: center;
+			margin-top : 50px;
+		}
+		#list {
+			text-align: center;
+			margin-top : 50px;
+
+		}
+
+		
+		select, input[type="number"] {
+			text-align: center;
+			padding: 10px;
+			font-size: 16px;
+			border: 2px solid #ccc;
+			border-radius: 5px;
+			background-color: white;
+		}
+		
+		ul {
+			list-style: none;
+			padding: 0;
+			margin: 0;
+		}
+		
+		button {
+			padding: 10px;
+			background-color: #4CAF50;
+			color: white;
+			border: none;
+			border-radius: 5px;
+			font-size: 18px;
+			cursor: pointer;
+			margin-top: 20px;
+			margin-left : 20px;
+		}
+		
+		button:hover {
+			background-color: #3e8e41;
+		}
+		
+		#orderList li {
+			background-color: white;
+			padding: 10px;
+			margin-bottom: 10px;
+			border: 1px solid #ccc;
+			border-radius: 5px;
+			box-shadow: 0 0 5px #ccc;
+		}
+		
+		#totalCost {
+			font-size: 24px;
+			font-weight: bold;
+			margin-top: 20px;
+		}
+
+		#submit{
+			text-align: center;
+		}
+		
+	</style>
+</head>
+<body>
+	
+			<h1>Welcome to our Hamburger Order Kiosk!</h1>
+			
+			<div id="choo1">
+			<h2>Choose your burger:</h2>
+			<select id="burger" name="burger">
+				<option value="5.99">Classic Burger - $5.99</option>
+				<option value="6.99">Bacon Burger - $6.99</option>
+				<option value="7.99">Double Burger - $7.99</option>
+			</select>
+			<button id="addBurger">+</button><br>
+			</div>
+			<hr>
+
+			<div id="choo2">
+			<h2>Choose your fries:</h2>
+			<select id="fries" name="fries">
+				<option value="1.99">Small Fries - $1.99</option>
+				<option value="2.99">Medium Fries - $2.99</option>
+				<option value="3.99">Large Fries - $3.99</option>
+			</select>
+			<button id="addFries">+</button><br>
+			</div>		
+			<hr>
+
+			<div id="choo3">
+			<h2>Choose your drink:</h2>
+			<select id="drink" name="drink">
+				<option value="1.49">Soda - $1.49</option>
+				<option value="2.49">Iced Tea - $2.49</option>
+				<option value="3.49">Milkshake - $3.49</option>
+			</select>
+			<button id="addDrink">+</button><br>
+			</div>
+			<hr>
+			
+			<div id="list">
+			<h2>Order List:</h2>
+			<ul id="orderList"></ul>
+			
+			<div id="totalCost"></div>
+			</div>
+
+			<div id="submit">
+			<button id="submitOrder">Submit Order</button>
+			</div>
+
+	<script>
+		const burgerSelect = document.getElementById("burger");
+		const friesSelect = document.getElementById("fries");
+		const drinkSelect = document.getElementById("drink");
+		const addBurgerButton = document.getElementById("addBurger");
+		const addFriesButton = document.getElementById("addFries");
+		const addDrinkButton = document.getElementById("addDrink");
+		const orderList = document.getElementById("orderList");
+		const totalCost = document.getElementById("totalCost");
+		let order = [];
+		let cost = 0;
+		
+		function addToOrder(item) {
+			let itemIndex = order.findIndex(i => i.name === item.name);
+			if (itemIndex === -1) {
+				order.push({ ...item, quantity: 1 });
+			} else {
+				order[itemIndex].quantity++;
+			}
+			updateOrderList();
+			updateTotalCost();
+		}
+		
+		function removeFromOrder(item) {
+			let itemIndex = order.findIndex(i => i.name === item.name);
+			if (itemIndex !== -1) {
+				if (order[itemIndex].quantity === 1) {
+					order.splice(itemIndex, 1);
+				} else {
+					order[itemIndex].quantity--;
+				}
+			}
+			updateOrderList();
+			updateTotalCost();
+		}
+		
+		function updateOrderList() {
+			orderList.innerHTML = "";
+			order.forEach(item => {
+				const li = document.createElement("li");
+				li.textContent = `${item.name} x ${item.quantity} - $${(item.price * item.quantity).toFixed(2)}`;
+				const removeButton = document.createElement("button");
+				removeButton.textContent = "-";
+				removeButton.addEventListener("click", () => removeFromOrder(item));
+				li.appendChild(removeButton);
+				orderList.appendChild(li);
+			});
+		}
+		
+		function updateTotalCost() {
+			cost = order.reduce((total, item) => total + item.price * item.quantity, 0);
+			totalCost.textContent = `Total Cost: $${cost.toFixed(2)}`;
+		}
+		
+		addBurgerButton.addEventListener("click", () => {
+			const item = {
+				name: burgerSelect.options[burgerSelect.selectedIndex].text,
+				price: parseFloat(burgerSelect.value)
+			};
+			addToOrder(item);
+		});
+		
+		addFriesButton.addEventListener("click", () => {
+			const item = {
+				name: friesSelect.options[friesSelect.selectedIndex].text,
+				price: parseFloat(friesSelect.value)
+			};
+			addToOrder(item);
+		});
+		
+		addDrinkButton.addEventListener("click", () => {
+			const item = {
+				name: drinkSelect.options[drinkSelect.selectedIndex].text,
+				price: parseFloat(drinkSelect.value)
+			};
+			addToOrder(item);
+		});
+
+		const submitButton = document.getElementById("submitOrder");
+
+			function onSubmit() {
+				console.log(order); // log the order data to the console
+			}
+
+			submitButton.addEventListener("click", onSubmit);
+	</script>
+	
+	
+</body>
+</html>
